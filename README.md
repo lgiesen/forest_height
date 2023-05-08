@@ -1,1 +1,10 @@
-# forest-height
+# WWU: Data Analytics II Case Study
+### Context
+The Federal Ministry for the Environment is seeking to find the height of every forest in Germany. However only sparse labels are available. 
+### Objective
+The task of this case study is to determine and approximate the height over forests. This regression is realized with a Machine Learning Regressor and a Convolutional Neural Network (CNN).
+
+### Data
+- Trainind set for training the model
+- Public test set for testing the model
+- Hidden test set for evaluating the model to determine grades
