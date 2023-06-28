@@ -33,6 +33,8 @@ def extract_data(data_filenames):
     -------
     dataset: Tuple of np.ndarray
     """
+    os.system('mkdir images')
+    os.system('mkdir masks')
     # unzip data
     for idx, filename in enumerate(data_filenames):
         if filename[0][-4:] != '.zip':
