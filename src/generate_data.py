@@ -1,33 +1,34 @@
 from os import listdir
 from os.path import isfile, join
+from zipfile import ZipFile
 
 import numpy as np
-from google.colab import drive
 
 root_path = 'drive/MyDrive/Colab Notebooks/data/'
 path_images = f'{root_path}images/'
 path_masks = f'{root_path}masks/'
-drive.mount ('/content/drive', force_remount=True)
 
 def get_files(dir):
     return [f for f in listdir(dir) if isfile(join(dir, f))]
 
-def extract_data(data_path):
+def extract_data(data_filenames):
     """
     Extract data from zipped files
 
     Parameters
     ----------
-    data_path: Array 
+    data_filenames: Array 
     Path to the train data (default: None)
+    root_path + filename = complete filepath 
 
     Returns
     -------
-    dataset: tf.data.Dataset
+    dataset: Tuple of np.ndarray
     """
     # unzip data
-    # for path in data_path:
-    #     !unzip path
+    for filename in data_filenames:
+        with ZipFile(filename, 'r') as zObject:
+            zObject.extractall(path=f"{root_path}{filename.replace('.zip','')}")
 
     # load satellite images
     X = np.load(f'/content/images/{get_files(path_images)[0]}')
@@ -46,8 +47,5 @@ def extract_data(data_path):
     X[X > ceiling] = ceiling
     #scale values between 0 and 1
     X = X / ceiling
-
-extract_data([f'{path_images}images_train.zip', f'{path_masks}masks_train.zip'])
-
-# remove drive connection as it is no longer needed
-drive.flush_and_unmount()
+    
+    return (X, y)
