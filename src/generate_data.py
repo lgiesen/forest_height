@@ -4,9 +4,6 @@ from zipfile import ZipFile
 
 import numpy as np
 
-root_path = 'drive/MyDrive/Colab Notebooks/data/'
-path_images = f'{root_path}images/'
-path_masks = f'{root_path}masks/'
 
 def get_files(dir):
     """
