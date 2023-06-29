@@ -53,6 +53,6 @@ def extract_data(data_filenames):
     X[X > ceiling] = ceiling
     #scale values between 0 and 1
     X = X / ceiling
-    del mask_or_img, temp, ceiling
+    del temp, ceiling
     
     return (X, y)
