@@ -4,6 +4,9 @@ from zipfile import ZipFile
 
 import numpy as np
 
+root_path = 'drive/MyDrive/Colab Notebooks/data/'
+path_images = f'{root_path}images/'
+path_masks = f'{root_path}masks/'
 
 def get_files(dir):
     """
@@ -33,16 +36,7 @@ def extract_data(data_filenames):
     -------
     dataset: Tuple of np.ndarray
     """
-    # unzip data
-    for idx, filename in enumerate(data_filenames):
-        if filename[0][-4:] != '.zip':
-            print(f'{filename} cannot be extracted because it is not a zip file.')
-            continue;
-        data_filenames[idx] = filename.replace('.zip','')
-        mask_or_img = 'masks' if 'mask' in filename else 'images'
-        with ZipFile(filename, 'r') as zObject:
-            zObject.extractall(path=f"{root_path}{mask_or_img}/{filename}")
-    
+
     # load satellite images by loading the first one and then concatenating the rest
     X = np.load(f'{path_images}{get_files(path_images)[0]}')
     for filename in get_files(path_images)[1:]:
