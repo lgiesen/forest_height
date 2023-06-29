@@ -10,3 +10,7 @@ The task of this case study is to determine and approximate the height over fore
 - Hidden test set for evaluating the model to determine grades
 ![data](https://user-images.githubusercontent.com/48908722/236777192-b88a25e5-b151-4998-a33c-3137bb290294.png)
 (Source: Lecture slides from [Prof. Gieseke](https://www.linkedin.com/in/fabian-gieseke/))
+
+
+### Link to completed masks
+https://uni-muenster.sciebo.de/s/3hsSPnGCSYzz2ur
