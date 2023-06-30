@@ -26,6 +26,5 @@ def plot(img):
     # Plot the image
     plt.figure(figsize=(5, 5))
     plt.imshow(img, cmap='viridis')
-    plt.axis('off')
     plt.show()
      
