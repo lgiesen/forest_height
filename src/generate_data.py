@@ -6,6 +6,10 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
+root_path = 'drive/MyDrive/Colab Notebooks/data/'
+path_images = f'{root_path}images/'
+path_masks = f'{root_path}masks/'
+
 
 def get_files(dir):
     """
