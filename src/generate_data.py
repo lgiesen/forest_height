@@ -3,6 +3,7 @@ from os.path import isfile, join
 from zipfile import ZipFile
 
 import numpy as np
+import pandas as pd
 from sklearn.model_selection import train_test_split
 
 
@@ -12,7 +13,7 @@ def get_files(dir):
 
     Parameters
     ----------
-    dir: Array of strings 
+    dir: Array of strings
 
     Returns
     -------
@@ -28,7 +29,7 @@ def extract_data(data_filenames):
     ----------
     data_filenames: Array of strings
     Path to the train data (default: None)
-    root_path + filename = complete filepath 
+    root_path + filename = complete filepath
 
     Returns
     -------
@@ -54,9 +55,9 @@ def extract_data(data_filenames):
     for filename in get_files(path_masks)[1:]:
         temp = np.load(f'{path_masks}{filename}', allow_pickle=True)
         y = np.concatenate((y, temp))
-  
+
     del temp, ceiling, num_imgs
-    
+
     return (X, y)
 
 def extract_labels(X, y):
@@ -70,25 +71,68 @@ def extract_labels(X, y):
 
     Returns
     -------
-    Tuple of numpy.ndarray
+    df: pandas.DataFrame
     """
     # extract non-zero value indices from y (= label position) to extract the corresponding X-value
-    # this has to be done for every image, because X has a different length than y, 
-    # if both are flattened due to more color channels
-    X_labeled = X[0].flat[np.nonzero(y[0].flat)[0]]
+    # prepare data to merge it into one data frame, 
+    # which makes it easier to extract the values of the same pixel
+    X = X.reshape(10, -1)
+    y = y.reshape(1, -1)
+    Xy = np.concatenate((X, y), axis=0)
+    Xy = Xy.transpose()
+    data = np.empty((0,11))
+    data = np.concatenate((data, Xy), axis=0)
     
-    for img_idx in range(1, y.shape[0]):
-        cur_img_nonzero_indices = np.nonzero(y[img_idx].flat)[0]
-        corresponding_cur_X_values = X[img_idx].flat[cur_img_nonzero_indices]
-        X_labeled = np.concatenate((X_labeled, corresponding_cur_X_values))
+    indices = np.nonzero(data[:,-1])
+    labeled_data = data[indices]
 
-    # y just has one dimension, so no loop is needed
-    y_labeled = y.flat[np.nonzero(y.flat)[0]]
+    # create dataframe with features and labels
+    df = pd.DataFrame(labeled_data) 
+    column_names = ['B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B8A', 'B11', 'B12', 'Label']
+    df.columns = column_names
+    
+    return df
+
+def upsample_data(df):
+    """
+    Upsample underrepresented data
+
+    Parameters
+    ----------
+    df: pandas.DataFrame
+
+    Returns
+    -------
+    features: pandas.DataFrame
+    labels: pandas.DataFrame
+    """
+
+    # sort data according to tree height asc
+    dfs = df.sort_values('Label').reset_index(drop=True) 
+    # create empty data frame to fill
+    dff = pd.DataFrame(columns=df.columns) 
+
+    index_start = 0
+    for i in range(3, 37, 3):
+      #count the number of intances that are in one interval for example 0 - 3 or 15 - 18
+      index_end = index_start + dfs["Label"][(dfs["Label"] > i - 3) & (dfs["Label"] < i)].count() 
+      # take random smaple of the interval
+      samp = dfs[index_start:index_end].sample(800) 
+      dff = pd.concat((dff, samp))
+      index_start = index_end
+
+    # add the highest values beacuase there are only a few
+    dff = pd.concat((dff, dfs[index_start:]))
+    dftr = dff.sample(frac=1).reset_index(drop=True) #shuffel the dataset randomly
+    
+    # extract features and labels
+    features = dftr.iloc[:, 0:10] 
+    labels = dftr.iloc[:,10]
+    
     # the length of X and y has to be the same
-    assert y_labeled.shape == X_labeled.shape
-    del corresponding_cur_X_values, cur_img_nonzero_indices
-    return (X_labeled, y_labeled)
-
+    # assert features.shape[0] == labels.shape[0]
+    return (features, labels)
+    
 def generate_dataset(zip_files):
     """
     Generate a dataset (X_train, X_test, y_train, y_test) based on the location of zip files
@@ -103,8 +147,10 @@ def generate_dataset(zip_files):
     """
     X, y = extract_data(zip_files)
     del zip_files
-    X_labeled, y_labeled = extract_labels(X, y)
+    df = extract_labels(X, y)
     del X, y
-    X_train, X_test, y_train, y_test = train_test_split(X_labeled, y_labeled, test_size=0.2, random_state=0, shuffle=True)
-    del X_labeled, y_labeled
+    features, labels = upsample_data(df)
+    del df
+    X_train, X_test, y_train, y_test = train_test_split(features, labels, test_size=0.2, random_state=0, shuffle=True)
+    del features, labels
     return (X_train, X_test, y_train, y_test)
