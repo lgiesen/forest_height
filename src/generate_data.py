@@ -25,15 +25,15 @@ def get_files(dir):
     """
     return [f for f in listdir(dir) if isfile(join(dir, f))]
 
-def extract_data(data_filenames):
+def extract_data(path_images, path_masks):
     """
     Extract data from zipped files
 
     Parameters
     ----------
-    data_filenames: Array of strings
+    path_images: String
+    path_masks: String
     Path to the train data (default: None)
-    root_path + filename = complete filepath
 
     Returns
     -------
@@ -118,12 +118,12 @@ def upsample_data(df):
 
     index_start = 0
     for i in range(3, 37, 3):
-      #count the number of intances that are in one interval for example 0 - 3 or 15 - 18
-      index_end = index_start + dfs["Label"][(dfs["Label"] > i - 3) & (dfs["Label"] < i)].count() 
-      # take random smaple of the interval
-      samp = dfs[index_start:index_end].sample(800) 
-      dff = pd.concat((dff, samp))
-      index_start = index_end
+        #count the number of intances that are in one interval for example 0 - 3 or 15 - 18
+        index_end = index_start + dfs["Label"][(dfs["Label"] > i - 3) & (dfs["Label"] < i)].count() 
+        # take random smaple of the interval
+        samp = dfs[index_start:index_end].sample(800) 
+        dff = pd.concat((dff, samp))
+        index_start = index_end
 
     # add the highest values beacuase there are only a few
     dff = pd.concat((dff, dfs[index_start:]))
@@ -136,25 +136,53 @@ def upsample_data(df):
     # the length of X and y has to be the same
     # assert features.shape[0] == labels.shape[0]
     return (features, labels)
-    
-def generate_dataset(zip_files):
+
+def calculate_ndvi(X, only_ndvi=False):
     """
     Generate a dataset (X_train, X_test, y_train, y_test) based on the location of zip files
 
     Parameters
     ----------
-    zip_files: Array of strings
+    X: pd.DataFrame
+    only_ndvi: boolean
 
     Returns
     -------
-    Numpy.ndarray
+    pd.DataFrame
     """
-    X, y = extract_data(zip_files)
-    del zip_files
+    # Extract the relevant bands for NDVI calculation
+    b4, b8 = X['B4'], X['B8']
+    # Calculate NDVI
+    ndvi = (b8 - b4) / (b8 + b4)
+
+    if only_ndvi:
+        return(ndvi)
+
+    # Add NDVI as a new feature to X
+    X["NDVI"] = ndvi
+    return X
+
+def generate_dataset(path_images, path_masks, only_ndvi=False, with_ndvi=False):
+    """
+    Generate a dataset (X_train, X_test, y_train, y_test) based on the location of zip files
+
+    Parameters
+    ----------
+    path_images: String
+    path_masks: String
+    Path to the train data (default: None)
+
+    Returns
+    -------
+    pd.DataFrame
+    """
+    X, y = extract_data(path_images, path_masks)
     df = extract_labels(X, y)
     del X, y
     features, labels = upsample_data(df)
     del df
+    if with_ndvi:
+        features = calculate_ndvi(features, only_ndvi)
     X_train, X_test, y_train, y_test = train_test_split(features, labels, test_size=0.2, random_state=0, shuffle=True)
     del features, labels
     return (X_train, X_test, y_train, y_test)
