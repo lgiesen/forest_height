@@ -201,7 +201,7 @@ def generate_dataset(path_images, path_masks, output_variables):
     ----------
     path_images: String
     path_masks: String
-    output_variables: List
+    output_variables: List (['color_channels', 'NDVI', 'VI'])
 
     Returns
     -------
