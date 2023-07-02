@@ -91,9 +91,8 @@ def extract_labels(X, y):
     labeled_data = data[indices]
 
     # create dataframe with features and labels
-    df = pd.DataFrame(labeled_data) 
-    column_names = ['B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B8A', 'B11', 'B12', 'Label']
-    df.columns = column_names
+    df = pd.DataFrame(labeled_data)
+    df.columns = ['B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B8A', 'B11', 'B12', 'Label']
     
     return df
 
