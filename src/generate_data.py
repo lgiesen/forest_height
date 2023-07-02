@@ -90,7 +90,7 @@ def extract_labels(X, y):
     indices = np.nonzero(data[:,-1])
     labeled_data = data[indices]
 
-    # create dataframe with features and labels
+    # create data frame with features and labels
     df = pd.DataFrame(labeled_data)
     df.columns = ['B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B8A', 'B11', 'B12', 'Label']
     
@@ -117,16 +117,16 @@ def upsample_data(df):
 
     index_start = 0
     for i in range(3, 37, 3):
-        #count the number of intances that are in one interval for example 0 - 3 or 15 - 18
+        #count the number of instances that are in one interval for example 0 - 3 or 15 - 18
         index_end = index_start + dfs["Label"][(dfs["Label"] > i - 3) & (dfs["Label"] < i)].count() 
-        # take random smaple of the interval
+        # take random sample of the interval
         samp = dfs[index_start:index_end].sample(800) 
         dff = pd.concat((dff, samp))
         index_start = index_end
 
-    # add the highest values beacuase there are only a few
+    # add the highest values because there are only a few
     dff = pd.concat((dff, dfs[index_start:]))
-    dftr = dff.sample(frac=1).reset_index(drop=True) #shuffel the dataset randomly
+    dftr = dff.sample(frac=1).reset_index(drop=True) #shuffle the dataset randomly
     
     # extract features and labels
     features = dftr.iloc[:, 0:10] 
@@ -169,7 +169,6 @@ def generate_dataset(path_images, path_masks, only_ndvi=False, with_ndvi=False):
     ----------
     path_images: String
     path_masks: String
-    Path to the train data (default: None)
 
     Returns
     -------
