@@ -214,12 +214,12 @@ def generate_dataset(path_images, path_masks, output_variables):
     del df
 
     # check for each output variable
-    if 'color_channels' not in output_variables:
-        features = pd.DataFrame()
     if 'NDVI' in output_variables:
         features = calculate_ndvi(features)
-    if 'VI' in output_variables: 
+    if 'VI' in output_variables:
         features = calculate_VIs(features)
+    if 'color_channels' not in output_variables:
+        features.drop(columns=features.columns[:10],axis=1, inplace=True)
 
     X_train, X_test, y_train, y_test = train_test_split(features, labels, test_size=0.2, random_state=0, shuffle=True)
     del features, labels
