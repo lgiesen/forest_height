@@ -106,12 +106,11 @@ def upsample_data(df):
 
     Returns
     -------
-    features: pandas.DataFrame
-    labels: pandas.DataFrame
+    pandas.DataFrame
     """
 
     # sort data according to tree height asc
-    dfs = df.sort_values('Label').reset_index(drop=True) 
+    dfs = df.sort_values('Label').reset_index(drop=True)
     # create empty data frame to fill
     dff = pd.DataFrame(columns=df.columns) 
 
@@ -126,42 +125,67 @@ def upsample_data(df):
 
     # add the highest values because there are only a few
     dff = pd.concat((dff, dfs[index_start:]))
-    dftr = dff.sample(frac=1).reset_index(drop=True) #shuffle the dataset randomly
-    
-    # extract features and labels
-    features = dftr.iloc[:, 0:10] 
-    labels = dftr.iloc[:,10]
-    
-    # the length of X and y has to be the same
-    # assert features.shape[0] == labels.shape[0]
-    return (features, labels)
+     #shuffle the dataset randomly
+    return dff.sample(frac=1).reset_index(drop=True)
 
-def calculate_ndvi(X, only_ndvi=False):
+def calculate_ndvi(X):
     """
     Generate a dataset (X_train, X_test, y_train, y_test) based on the location of zip files
 
     Parameters
     ----------
     X: pd.DataFrame
-    only_ndvi: boolean
 
     Returns
     -------
-    pd.DataFrame
+    pandas.DataFrame
     """
     # Extract the relevant bands for NDVI calculation
     b4, b8 = X['B4'], X['B8']
     # Calculate NDVI
     ndvi = (b8 - b4) / (b8 + b4)
 
-    if only_ndvi:
-        return(ndvi)
-
     # Add NDVI as a new feature to X
     X["NDVI"] = ndvi
     return X
 
-def generate_dataset(path_images, path_masks, only_ndvi=False, with_ndvi=False):
+def calculate_VIs(X):
+    """
+    Generate a dataset (X_train, X_test, y_train, y_test) based on the location of zip files
+
+    Parameters
+    ----------
+    X: pd.DataFrame
+
+    Returns
+    -------
+    pandas.DataFrame
+    """
+    # Extract the relevant bands for calculating VIs
+    b2, b4, b5, b6 = X['B2'], X['B4'], X['B5'], X['B6']
+    b7, b8 = X['B7'], X['B8']
+
+    # Enhanced Vegetation Index
+    evi = 2.5 * ((b8 - b4) / (b8 + 6 * b4 - 7.5 * b2 + 1)) 
+
+    # Soil Adjusted Vegetation Index (SAVI) 
+    savi = (b8 - b4) / (b8 + b4 + 0.428) * (1.428)
+
+    # Inverted Red-Edge Chlorophyll Index
+    ireci =  b7 - b4 / (b5 / b6) 
+
+    # Sentinel 2 Red Edge Position
+    s2rep = 705 + 35 * ((b7 + b4) / 2 - b5) / (b6 - b5) 
+
+    # Add VIs as a new feature to X
+    X["EVI"] = evi
+    X["SAVI"] = savi 
+    X["IRECI"] = ireci
+    X["s2rep"] = s2rep
+    return X
+
+
+def generate_dataset(path_images, path_masks, output_variables, is_balanced = False):
     """
     Generate a dataset (X_train, X_test, y_train, y_test) based on the location of zip files
 
@@ -169,18 +193,29 @@ def generate_dataset(path_images, path_masks, only_ndvi=False, with_ndvi=False):
     ----------
     path_images: String
     path_masks: String
+    output_variables: List (['color_channels', 'NDVI', 'VI'])
 
     Returns
     -------
     pd.DataFrame
     """
     X, y = extract_data(path_images, path_masks)
-    df = extract_labels(X, y)
+    Xy = extract_labels(X, y)
     del X, y
-    features, labels = upsample_data(df)
-    del df
-    if with_ndvi:
-        features = calculate_ndvi(features, only_ndvi)
+    if is_balanced:
+        Xy = upsample_data(Xy)
+    # extract features and labels
+    features = Xy.iloc[:, 0:10] 
+    labels = Xy.iloc[:,10]
+
+    # check for each output variable
+    if 'NDVI' in output_variables:
+        features = calculate_ndvi(features)
+    if 'VI' in output_variables:
+        features = calculate_VIs(features)
+    if 'color_channels' not in output_variables:
+        features.drop(columns=features.columns[:10],axis=1, inplace=True)
+
     X_train, X_test, y_train, y_test = train_test_split(features, labels, test_size=0.2, random_state=0, shuffle=True)
     del features, labels
     return (X_train, X_test, y_train, y_test)
