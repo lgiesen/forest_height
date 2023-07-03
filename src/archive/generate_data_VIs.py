@@ -111,7 +111,7 @@ def upsample_data(df):
     """
 
     # sort data according to tree height asc
-    dfs = df.sort_values('Label').reset_index(drop=True) 
+    dfs = df.sort_values('Label').reset_index(drop=True)
     # create empty data frame to fill
     dff = pd.DataFrame(columns=df.columns) 
 
@@ -126,15 +126,8 @@ def upsample_data(df):
 
     # add the highest values because there are only a few
     dff = pd.concat((dff, dfs[index_start:]))
-    dftr = dff.sample(frac=1).reset_index(drop=True) #shuffle the dataset randomly
-    
-    # extract features and labels
-    features = dftr.iloc[:, 0:10] 
-    labels = dftr.iloc[:,10]
-    
-    # the length of X and y has to be the same
-    # assert features.shape[0] == labels.shape[0]
-    return (features, labels)
+     #shuffle the dataset randomly
+    return dff.sample(frac=1).reset_index(drop=True)
 
 def calculate_ndvi(X):
     """
@@ -193,7 +186,7 @@ def calculate_VIs(X):
     return X
 
 
-def generate_dataset(path_images, path_masks, output_variables):
+def generate_dataset(path_images, path_masks, output_variables, is_balanced = False):
     """
     Generate a dataset (X_train, X_test, y_train, y_test) based on the location of zip files
 
@@ -208,10 +201,13 @@ def generate_dataset(path_images, path_masks, output_variables):
     pd.DataFrame
     """
     X, y = extract_data(path_images, path_masks)
-    df = extract_labels(X, y)
+    Xy = extract_labels(X, y)
     del X, y
-    features, labels = upsample_data(df)
-    del df
+    if is_balanced:
+        Xy = upsample_data(Xy)
+    # extract features and labels
+    features = Xy.iloc[:, 0:10] 
+    labels = Xy.iloc[:,10]
 
     # check for each output variable
     if 'NDVI' in output_variables:
