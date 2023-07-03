@@ -182,7 +182,8 @@ def calculate_VIs(X):
     X["SAVI"] = savi 
     X["IRECI"] = ireci
     X["s2rep"] = s2rep
-    return X
+    # replace empty (np.nan) values with 0 because some denominators might have been 0
+    return X.replace(np.nan,0)
 
 
 def generate_dataset(path_images, path_masks, output_variables, is_balanced = False):
