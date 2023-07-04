@@ -5,6 +5,7 @@ from zipfile import ZipFile
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
 
 root_path = 'drive/MyDrive/Colab Notebooks/data/'
 path_images = f'{root_path}images/'
@@ -25,7 +26,7 @@ def get_files(dir):
     """
     return [f for f in listdir(dir) if isfile(join(dir, f))]
 
-def extract_data(path_images, path_masks):
+def extract_data(path_images, path_masks, ceil_values=False, scale_values=False):
     """
     Extract data from zipped files
 
@@ -49,18 +50,20 @@ def extract_data(path_images, path_masks):
     num_imgs = len(get_files(path_images))
     X = X.reshape((num_imgs, int(X.shape[0]/num_imgs), X.shape[1], X.shape[2]))
     # ceil the values at 2000 because clouds have a different reflection value
-    ceiling = 2000
-    X[X > ceiling] = ceiling
-    #scale values between 0 and 1
-    X = X / ceiling
-
+    if ceil_values:
+        ceiling = 2000
+        X[X > ceiling] = ceiling
+    if scale_values:
+        scaler = StandardScaler()
+        scaler.fit_transform(np.reshape(X, (10,20*1024*1024)))
+        
     # load labels by loading the first one and then concatenating the rest
     y = np.load(f'{path_masks}{get_files(path_masks)[0]}')
     for filename in get_files(path_masks)[1:]:
         temp = np.load(f'{path_masks}{filename}', allow_pickle=True)
         y = np.concatenate((y, temp))
 
-    del temp, ceiling, num_imgs
+    del temp, num_imgs
 
     return (X, y)
 
@@ -91,8 +94,7 @@ def extract_labels(X, y):
     labeled_data = data[indices]
 
     # create data frame with features and labels
-    df = pd.DataFrame(labeled_data)
-    df.columns = ['B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B8A', 'B11', 'B12', 'Label']
+    df = pd.DataFrame(labeled_data, columns = ['B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B8A', 'B11', 'B12', 'Label'])
     
     return df
 
