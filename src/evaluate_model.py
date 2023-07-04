@@ -1,5 +1,5 @@
+import joblib
 import matplotlib.pyplot as plt
-from forest_height.src.load_data import load_data
 from matplotlib.ticker import StrMethodFormatter
 from sklearn.metrics import (mean_absolute_error,
                              mean_absolute_percentage_error,
@@ -119,3 +119,9 @@ def pred_vs_true(model, model_name, ds="all"):
     plt.ylabel('Forest Height')
     ax.legend(("True Value", "Prediction"), loc='upper left')
     plt.show()
+
+def save_model(model, modelname, ds):
+    train_evaluate_model(model, [ds])
+    joblib.dump(model, f'forest_height/models/{modelname}.joblib')
+    # load model with:
+    # model = joblib.load("forest_height/models/{model_name}.joblib")
