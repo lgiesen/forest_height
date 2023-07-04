@@ -1,9 +1,10 @@
 import matplotlib.pyplot as plt
-from forest_height.src.load_data import load_data
 from matplotlib.ticker import StrMethodFormatter
 from sklearn.metrics import (mean_absolute_error,
                              mean_absolute_percentage_error,
                              mean_squared_error)
+
+from src.load_data import load_data
 
 color = "#01748F"
 
