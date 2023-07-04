@@ -14,6 +14,16 @@ def evaluate_model(y_test, y_pred):
     print(f'MAE: {mae}; MSE: {mse}; RMSE: {rmse}; MAPE: {mape}')
     return (mae, mse, rmse, mape)
 
+def train_evaluate_model(model, dataset=["color_channels", "color_channels_ndvi", "ndvi", "all"]):
+    for ds in dataset:
+        print(ds)
+        X_train, y_train, X_test, y_test = load_data(ds)
+        # train model
+        model.fit(X_train, y_train)
+        # predict test set
+        y_pred = model.predict(X_test)
+        # evaluate model
+        mae, mse, rmse, mape = evaluate_model(y_test, y_pred)
 
 
 def feature_importance(model, model_name, cols=['B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B8A', 'B11', 'B12', 'NDVI', 'EVI', 'SAVI', 'IRECI', 's2rep']):
