@@ -29,7 +29,7 @@ def get_files(dir, filetype=None):
         files = list(filter(lambda k: f'.{filetype}' in k, files))
     return files
 
-def extract_data(path_images, path_masks, ceil_values=True, scale_values=False):
+def extract_data(path_images, path_masks, filetype=None):
     """
     Extract data from zipped files
 
@@ -45,24 +45,19 @@ def extract_data(path_images, path_masks, ceil_values=True, scale_values=False):
     """
 
     # load satellite images by loading the first one and then concatenating the rest
-    X = np.load(f'{path_images}{get_files(path_images)[0]}')
-    for filename in get_files(path_images)[1:]:
+    imgs = get_files(path_images, filetype)
+    X = np.load(f'{path_images}{imgs[0]}')
+    for filename in imgs[1:]:
         temp = np.load(f'{path_images}{filename}', allow_pickle=True)
         X = np.concatenate((X, temp))
     # reshape X to distinguish between image and color channel
-    num_imgs = len(get_files(path_images))
+    num_imgs = len(imgs)
     X = X.reshape((num_imgs, int(X.shape[0]/num_imgs), X.shape[1], X.shape[2]))
-    # ceil the values at 2000 because clouds have a different reflection value
-    if ceil_values:
-        ceiling = 2000
-        X[X > ceiling] = ceiling
-    if scale_values:
-        scaler = StandardScaler()
-        scaler.fit_transform(np.reshape(X, (10,20*1024*1024)))
         
     # load labels by loading the first one and then concatenating the rest
-    y = np.load(f'{path_masks}{get_files(path_masks)[0]}')
-    for filename in get_files(path_masks)[1:]:
+    masks = get_files(path_masks, filetype)
+    y = np.load(f'{path_masks}{masks[0]}')
+    for filename in masks[1:]:
         temp = np.load(f'{path_masks}{filename}', allow_pickle=True)
         y = np.concatenate((y, temp))
 
@@ -191,7 +186,7 @@ def calculate_VIs(X):
     return X.replace(np.nan,0)
 
 
-def generate_dataset(path_images, path_masks, output_variables, is_balanced = False):
+def generate_dataset(path_images, path_masks, output_variables, is_balanced=False, ceil_values=True, scale_values=True, filetype=None):
     """
     Generate a dataset (X_train, X_test, y_train, y_test) based on the location of zip files
 
@@ -205,7 +200,7 @@ def generate_dataset(path_images, path_masks, output_variables, is_balanced = Fa
     -------
     pd.DataFrame
     """
-    X, y = extract_data(path_images, path_masks)
+    X, y = extract_data(path_images, path_masks, filetype)
     Xy = extract_labels(X, y)
     del X, y
     if is_balanced:
@@ -213,7 +208,7 @@ def generate_dataset(path_images, path_masks, output_variables, is_balanced = Fa
     # extract features and labels
     features = Xy.iloc[:, 0:10] 
     labels = Xy.iloc[:,10]
-
+    del Xy
     # check for each output variable
     if 'NDVI' in output_variables:
         features = calculate_ndvi(features)
@@ -221,6 +216,17 @@ def generate_dataset(path_images, path_masks, output_variables, is_balanced = Fa
         features = calculate_VIs(features)
     if 'color_channels' not in output_variables:
         features.drop(columns=features.columns[:10],axis=1, inplace=True)
+
+    # ceil the values at 2000 because clouds have a different reflection value
+    if ceil_values:
+        ceiling = 2000
+        # counteract high reflection values of clouds
+        features[features > ceiling] = ceiling
+        # counteract significant negative vegetation indices
+        features[features < -1*ceiling] = -1*ceiling
+    if scale_values:
+        scaler = StandardScaler()
+        features = scaler.fit_transform(features)
 
     X_train, X_test, y_train, y_test = train_test_split(features, labels, test_size=0.2, random_state=0, shuffle=True)
     del features, labels
