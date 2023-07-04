@@ -24,7 +24,8 @@ def plot(img):
         img = normalize_color(img)
 
     # Plot the image
-    plt.figure(figsize=(5, 5))
     plt.imshow(img, cmap='viridis')
+    # Add colorbar for reference
+    plt.colorbar()
     plt.show()
      
