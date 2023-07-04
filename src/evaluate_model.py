@@ -31,7 +31,7 @@ def feature_importance(model, model_name, cols=['B2', 'B3', 'B4', 'B5', 'B6', 'B
 def pred_vs_true(model_name, ds="all"):
     # get necessary data
     X_train, y_train, X_test, y_test = load_data(ds)
-    y_pred = gbr.predict(X_test)
+    y_pred = model.predict(X_test)
     
     # visualize predictions vs. true labels
     fig = plt.figure(figsize=(6,6))
