@@ -3,6 +3,7 @@ from matplotlib.ticker import StrMethodFormatter
 from sklearn.metrics import (mean_absolute_error,
                              mean_absolute_percentage_error,
                              mean_squared_error)
+fromo load_data import
 
 color = "#01748F"
 
@@ -28,7 +29,7 @@ def feature_importance(model, model_name, cols=['B2', 'B3', 'B4', 'B5', 'B6', 'B
     plt.title(f"Feature Importance of {model_name} Regression")
     plt.show()
 
-def pred_vs_true(model_name, ds="all"):
+def pred_vs_true(model, model_name, ds="all"):
     # get necessary data
     X_train, y_train, X_test, y_test = load_data(ds)
     y_pred = model.predict(X_test)
