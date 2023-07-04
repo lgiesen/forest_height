@@ -12,7 +12,7 @@ path_images = f'{root_path}images/'
 path_masks = f'{root_path}masks/'
 
 
-def get_files(dir):
+def get_files(dir, filetype=None):
     """
     Get all files from a directory
 
@@ -24,9 +24,12 @@ def get_files(dir):
     -------
     Array of strings
     """
-    return [f for f in listdir(dir) if isfile(join(dir, f))]
+    files = [f for f in listdir(dir) if isfile(join(dir, f))]
+    if filetype:
+        files = list(filter(lambda k: f'.{filetype}' in k, files))
+    return files
 
-def extract_data(path_images, path_masks, ceil_values=False, scale_values=False):
+def extract_data(path_images, path_masks, ceil_values=True, scale_values=False):
     """
     Extract data from zipped files
 
