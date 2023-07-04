@@ -7,14 +7,6 @@ def load_img(filepath, features):
     X = np.load(filepath)
     color_channels, width, height = X.shape
     Xr = X.reshape(color_channels,-1).transpose()
-    #if "color_channels" in features:
-    ceiling = 2000
-    # counteract high reflection values of clouds
-    Xr[Xr > ceiling] = ceiling
-    X[X > ceiling] = ceiling
-    # counteract significant negative vegetation indices
-    Xr[Xr < -1*ceiling] = -1*ceiling
-    X[X < -1*ceiling] = -1*ceiling
     assert len(X.shape) == 3
     color_channels, width, height = X.shape
     Xr = np.reshape(Xr, (width*height, color_channels))
@@ -31,8 +23,15 @@ def load_img(filepath, features):
             Xr = X_VI[vi_cols]
         elif features == ["NDVI", "VI"]:
             Xr = Xr[["NDVI", "EVI", "SAVI", "IRECI", "s2rep"]]
+    ceiling = 2000
+    # counteract high reflection values of clouds
+    Xr[Xr > ceiling] = ceiling
+    X[X > ceiling] = ceiling
+    # counteract significant negative vegetation indices
+    Xr[Xr < -1*ceiling] = -1*ceiling
+    X[X < -1*ceiling] = -1*ceiling
     scaler = StandardScaler()
-    X, Xr = scaler.fit_transform(Xr), scaler.fit_transform(X)
+    Xr = scaler.fit_transform(Xr)
     return X, Xr, (color_channels, width, height)
 
 def pred_img(filepath, features, model, plot_img=True, scale=True):
