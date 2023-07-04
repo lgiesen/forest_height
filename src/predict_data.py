@@ -1,5 +1,7 @@
 import numpy as np
 import pandas as pd
+from forest_height.src.generate_data import calculate_ndvi, calculate_VIs
+from forest_height.src.visualize_data import plot
 from sklearn.preprocessing import StandardScaler
 
 
