@@ -3,7 +3,6 @@ from matplotlib.ticker import StrMethodFormatter
 from sklearn.metrics import (mean_absolute_error,
                              mean_absolute_percentage_error,
                              mean_squared_error)
-fromo load_data import
 
 color = "#01748F"
 
