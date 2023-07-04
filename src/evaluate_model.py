@@ -121,8 +121,7 @@ def pred_vs_true(model, model_name, ds="all"):
     ax.legend(("True Value", "Prediction"), loc='upper left')
     plt.show()
 
-def save_model(model, modelname, ds):
-    train_evaluate_model(model, [ds])
+def save_model(model, modelname):
     joblib.dump(model, f'forest_height/models/{modelname}.joblib')
     # load model with:
     # model = joblib.load("forest_height/models/{model_name}.joblib")
