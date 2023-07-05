@@ -24,3 +24,5 @@ Worth taking a look at: notebooks/compare_models.py to understand how models per
 
 ### Link to completed masks
 https://uni-muenster.sciebo.de/s/3hsSPnGCSYzz2ur
+
+> :rocket: You can check out the ![poster](https://github.com/lgiesen/forest_height/blob/main/group-6-poster.pdf) to get a good overview of the project!
