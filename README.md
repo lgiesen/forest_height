@@ -7,6 +7,7 @@ The Federal Ministry for the Environment in Germany is seeking to find the heigh
 ### File Structure
 - assets: all visualizations from the models
 - data: all saved feature combinations as a data basis (only color channels, NDVI, other VIs and all)
+- models: ML models
 - notebooks: inspect data, train models etc.
 - src: python scripts used by notebooks
 
