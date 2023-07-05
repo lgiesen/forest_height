@@ -16,8 +16,8 @@ The Federal Ministry for the Environment in Germany is seeking to find the heigh
 - notebooks: inspect data, train models etc.
 - src: python scripts used by notebooks
 
-NotebookFinal.ipynb: central notebook for submission
-Worth taking a look at: notebooks/compare_models.py to understand how models performed against one another.
+> NotebookFinal.ipynb: central notebook for submission
+> Worth taking a look at: notebooks/compare_models.py to understand how models performed against one another.
 
 <hr/>
 
