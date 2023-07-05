@@ -15,6 +15,7 @@ NotebookFinal.ipynb: central notebook for submission
 Worth taking a look at: notebooks/compare_models.py to understand how models performed against one another.
 
 <hr/>
+
 ### Data
 - Training set for training the model
 - Public test set for testing the model
