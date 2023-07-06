@@ -5,10 +5,6 @@ The task of this case study is to determine and approximate the height over fore
 ### Context
 The Federal Ministry for the Environment in Germany is seeking to find the height of every forest in Germany. There are satellite images one can take advantage of to determine the forest height. This regression task requires labels, which are very sparse. In this case study, various approaches are implemented to overcome challenges such as these to determine the forest height in Germany with satellite images. 
 
-
-> :rocket: You can check out the ![poster](https://github.com/lgiesen/forest_height/blob/main/group-6-poster.pdf) to get a good overview of the project!
-
-
 ### File Structure
 - assets: all visualizations from the models
 - data: all saved feature combinations as a data basis (only color channels, NDVI, other VIs and all)
@@ -19,7 +15,8 @@ The Federal Ministry for the Environment in Germany is seeking to find the heigh
 > NotebookFinal.ipynb: central notebook for submission
 > Worth taking a look at: notebooks/compare_models.py to understand how models performed against one another.
 
-<hr/>
+
+![poster](https://github.com/lgiesen/forest_height/blob/main/group-6-poster.png)
 
 ### Data
 - Training set for training the model
