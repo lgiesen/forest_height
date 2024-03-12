@@ -1,9 +1,12 @@
 [![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/downloads/release/python-390/) 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](https://opensource.org/license/mit) 
 ![GitHub version](https://img.shields.io/github/v/release/lgiesen/forest_height?color=green&include_prereleases)
+<img align="right" height="72px" src="https://raw.githubusercontent.com/lgiesen/forest_height/main/logo.png" />
 
-# <img height="60px" src="https://raw.githubusercontent.com/lgiesen/forest_height/main/logo.png" style="margin-right:5px;"/>Title Case
 # Data Analytics II Case Study
+
+
+
 ### Objective
 The task of this case study is to determine and approximate the height over forests. This regression is realized with a Machine Learning Regressor and a Convolutional Neural Network (CNN).
 
